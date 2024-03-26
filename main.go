@@ -30,6 +30,8 @@ func (server *Server) MountHandlers() {
 	server.Router.Get("/tables", handlers.GetTables)
 	server.Router.Get("/todos", handlers.GetTodos)
 	server.Router.Post("/todos", handlers.CreateItem)
+	server.Router.Get("/todos/{id}", handlers.GetTodoById)
+	server.Router.Delete("/todos/{id}", handlers.DeleteTodoById)
 }
 
 func CreateNewServer(client *dynamodb.Client) *Server {
@@ -49,6 +51,7 @@ func Config() (*dynamodb.Client, error) {
 		return nil, err
 	}
 	client := dynamodb.NewFromConfig(cfg)
+	log.Println("[config] Dynamodb client loaded")
 	return client, nil
 }
 
