@@ -6,48 +6,29 @@ import (
 	"fmt"
 )
 
-type LFU struct {
+type LFUCache struct {
 	frequencyListMap map[int]*list.List
-	elementsFreq     map[*list.Element]int
-	minFreq          int
+	elementsFreqMap  map[*list.Element]int
+	minFrequency     int
 }
 
-func newLFU() *LFU {
-	return &LFU{
+func newLFUCache() *LFUCache {
+	return &LFUCache{
 		frequencyListMap: make(map[int]*list.List),
-		elementsFreq:     make(map[*list.Element]int),
-		minFreq:          0,
+		elementsFreqMap:  make(map[*list.Element]int),
+		minFrequency:     0,
 	}
 }
 
-func (c *LFU) Evict() *list.Element {
-	if c.minFreq == 0 {
-		return nil
-	}
-	newList, ok := c.frequencyListMap[c.minFreq]
-	if !ok || newList.Len() == 0 {
-		return nil
-	}
-	element := newList.Back()
-	newList.Remove(element)
-	delete(c.elementsFreq, element)
+func (c *LFUCache) Get(element *list.Element) *list.Element {
+	freq, node := c.elementsFreqMap[element], element.Value
 
-	if newList.Len() == 0 {
-		delete(c.frequencyListMap, c.minFreq)
-		c.minFreq++
-	}
-	return element
-}
-
-func (c *LFU) Get(element *list.Element) *list.Element {
-	node, freq := element.Value, c.elementsFreq[element]
-	delete(c.elementsFreq, element)
+	delete(c.elementsFreqMap, element)
 	c.frequencyListMap[freq].Remove(element)
-
 	if c.frequencyListMap[freq].Len() == 0 {
 		delete(c.frequencyListMap, freq)
-		if c.minFreq == freq {
-			c.minFreq++
+		if freq == c.minFrequency {
+			c.minFrequency++
 		}
 	}
 
@@ -55,36 +36,59 @@ func (c *LFU) Get(element *list.Element) *list.Element {
 	if c.frequencyListMap[freq] == nil {
 		c.frequencyListMap[freq] = list.New()
 	}
-	newElement := c.frequencyListMap[freq].PushFront(node)
-	c.elementsFreq[newElement] = freq
-	return newElement
+	element = c.frequencyListMap[freq].PushFront(node)
+	c.elementsFreqMap[element] = freq
+	return element
 }
 
-func (c *LFU) Put(node any) *list.Element {
+func (c *LFUCache) Evict() *list.Element {
+	if c.minFrequency == 0 {
+		return nil
+	}
+	list, ok := c.frequencyListMap[c.minFrequency]
+	if !ok || list.Len() == 0 {
+		return nil
+	}
+
+	last := c.frequencyListMap[c.minFrequency].Back()
+	if last != nil {
+		c.frequencyListMap[c.minFrequency].Remove(last)
+		delete(c.elementsFreqMap, last)
+	}
+
+	if c.frequencyListMap[c.minFrequency].Len() == 0 {
+		delete(c.frequencyListMap, c.minFrequency)
+		c.minFrequency++
+	}
+
+	return last
+}
+
+func (c *LFUCache) Put(node any) *list.Element {
 	if c.frequencyListMap[1] == nil {
 		c.frequencyListMap[1] = list.New()
 	}
 	element := c.frequencyListMap[1].PushFront(node)
-	c.elementsFreq[element] = 1
-	c.minFreq = 1
+	c.elementsFreqMap[element] = 1
+	c.minFrequency = 1
 	return element
 }
 
-func (c *LFU) Delete(element *list.Element) {
-	freq := c.elementsFreq[element]
-	delete(c.elementsFreq, element)
+func (c *LFUCache) Delete(element *list.Element) {
+	freq := c.elementsFreqMap[element]
+	delete(c.elementsFreqMap, element)
 	c.frequencyListMap[freq].Remove(element)
 
 	if c.frequencyListMap[freq].Len() == 0 {
 		delete(c.frequencyListMap, freq)
-		if c.minFreq == freq {
-			c.minFreq++
+		if c.minFrequency == freq {
+			c.minFrequency++
 		}
 	}
 }
 
 // just for debugging
-func (c *LFU) Print() {
+func (c *LFUCache) Print() {
 	fmt.Println("LFU Cache State:")
 	for freq, l := range c.frequencyListMap {
 		fmt.Printf("Frequency %d: ", freq)

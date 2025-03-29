@@ -20,12 +20,17 @@ func (n *Node[T, U]) GetKey() T {
 	return n.key
 }
 
+func (n *Node[T, U]) GetValue() U {
+	return n.value
+}
+
 func (n *Node[T, U]) GetTTL() time.Time {
 	return n.ttl
 }
 
-func (n *Node[T, U]) GetValue() U {
-	return n.value
+// IsExpire: returns true if ttl is expire else false
+func (n *Node[T, U]) IsExpire() bool {
+	return n.ttl.Before(time.Now())
 }
 
 func (n *Node[T, U]) UpdateValue(value U) *Node[T, U] {

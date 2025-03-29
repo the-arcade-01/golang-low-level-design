@@ -6,38 +6,40 @@ import (
 	"fmt"
 )
 
-type FIFO struct {
+type FIFOCache struct {
 	list *list.List
 }
 
-func newFIFO() *FIFO {
-	return &FIFO{
+func newFIFOCache() *FIFOCache {
+	return &FIFOCache{
 		list: list.New(),
 	}
 }
 
-func (c *FIFO) Evict() *list.Element {
-	first := c.list.Front()
-	if first != nil {
-		c.list.Remove(first)
-	}
-	return first
-}
-
-func (c *FIFO) Get(element *list.Element) *list.Element {
+func (c *FIFOCache) Get(element *list.Element) *list.Element {
 	return element
 }
 
-func (c *FIFO) Put(node any) *list.Element {
+func (c *FIFOCache) Evict() *list.Element {
+	front := c.list.Front()
+	if front != nil {
+		c.list.Remove(front)
+	}
+	return front
+}
+
+func (c *FIFOCache) Put(node any) *list.Element {
 	return c.list.PushBack(node)
 }
 
-func (c *FIFO) Delete(element *list.Element) {
-	c.list.Remove(element)
+func (c *FIFOCache) Delete(element *list.Element) {
+	if element != nil {
+		c.list.Remove(element)
+	}
 }
 
 // just for debugging
-func (c *FIFO) Print() {
+func (c *FIFOCache) Print() {
 	for e := c.list.Front(); e != nil; e = e.Next() {
 		fmt.Printf("%v ", e.Value.(*models.Node[string, string]).GetKey())
 	}

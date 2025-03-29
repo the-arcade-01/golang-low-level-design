@@ -6,17 +6,22 @@ import (
 	"fmt"
 )
 
-type LRU struct {
+type LRUCache struct {
 	list *list.List
 }
 
-func newLRU() *LRU {
-	return &LRU{
+func newLRUCache() *LRUCache {
+	return &LRUCache{
 		list: list.New(),
 	}
 }
 
-func (c *LRU) Evict() *list.Element {
+func (c *LRUCache) Get(element *list.Element) *list.Element {
+	c.list.MoveToFront(element)
+	return element
+}
+
+func (c *LRUCache) Evict() *list.Element {
 	last := c.list.Back()
 	if last != nil {
 		c.list.Remove(last)
@@ -24,21 +29,18 @@ func (c *LRU) Evict() *list.Element {
 	return last
 }
 
-func (c *LRU) Get(element *list.Element) *list.Element {
-	c.list.MoveToFront(element)
-	return element
-}
-
-func (c *LRU) Put(node any) *list.Element {
+func (c *LRUCache) Put(node any) *list.Element {
 	return c.list.PushFront(node)
 }
 
-func (c *LRU) Delete(element *list.Element) {
-	c.list.Remove(element)
+func (c *LRUCache) Delete(element *list.Element) {
+	if element != nil {
+		c.list.Remove(element)
+	}
 }
 
 // just for debugging
-func (c *LRU) Print() {
+func (c *LRUCache) Print() {
 	for e := c.list.Front(); e != nil; e = e.Next() {
 		fmt.Printf("%v ", e.Value.(*models.Node[string, string]).GetKey())
 	}

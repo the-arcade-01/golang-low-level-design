@@ -6,7 +6,7 @@ Design and implement an **in-memory cache** that supports the following features
 
 1. **Basic Operations**:
 
-   - `Set(key, value, ttl)`: Add a key-value pair with a time-to-live (TTL).
+   - `Put(key, value, ttl)`: Add a key-value pair with a time-to-live (TTL).
    - `Get(key)`: Retrieve the value for a key if it exists and hasn't expired.
    - `Delete(key)`: Remove a key manually.
 
@@ -27,7 +27,9 @@ Design and implement an **in-memory cache** that supports the following features
 
 ### Future Improvements
 
-- TTL based keys removal pending (might use heap for removing expired keys)
+- TTL based keys removal pending (
+  - might loop through storage map based on interval time, O(n)
+  - might use heap for removing expired keys, insertion O(nlogn), update O(logn))
 - Storage map in cache can be moved out as separate interface and the above thing can be placed in there.
 
 ### Solution:
