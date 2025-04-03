@@ -1,23 +1,29 @@
 package main
 
 import (
-	"task-scheduler/internal/models"
-	"task-scheduler/internal/scheduler"
+	"task-scheduler/internal/config"
+	"task-scheduler/internal/task"
 	"time"
 )
 
 func main() {
-	scheduler := scheduler.NewTaskScheduler()
+	pool := config.NewWorkerPool(5)
 
-	fixedTime := time.Now().Add(time.Duration(4) * time.Second)
+	taskScheduler := task.NewTaskScheduler(pool)
+	taskService := task.NewTaskService(taskScheduler)
 
-	task1 := models.NewTask(1, "Testing task1", "Meowth", models.OneTime, 3, fixedTime, models.Medium, 300)
-	task2 := models.NewTask(2, "Testing task2", "Ben10", models.FixedDelay, 3, fixedTime, models.Low, 300)
-	task3 := models.NewTask(3, "Testing task3", "Gwen", models.FixedRate, 3, fixedTime, models.High, 300)
+	task1 := taskService.CreateTask("Pikachu Capture", "Team Rocket", 3, task.High, task.FixedRate, 60, 180)
+	task2 := taskService.CreateTask("Defeat Vilgax", "Ben 10", 3, task.Low, task.FixedDelay, 30, 120)
+	task3 := taskService.CreateTask("Eat Ramen", "Naruto", 3, task.Low, task.OneTime, 10, 0)
 
-	scheduler.AddTask(task1)
-	scheduler.AddTask(task2)
-	scheduler.AddTask(task3)
+	taskScheduler.Schedule(task1)
+	taskScheduler.Schedule(task2)
+	taskScheduler.Schedule(task3)
 
-	scheduler.Pop()
+	go func() {
+		time.Sleep(time.Duration(40) * time.Second)
+		taskService.StopTask(task2.ID)
+	}()
+
+	pool.Wait()
 }

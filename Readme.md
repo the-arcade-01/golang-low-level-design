@@ -4,9 +4,10 @@ Contains my approaches on some low-level design or machine coding interview ques
 
 ### Table of Contents
 
-| Problem                           | Solution                                                                                              | Blog                                                                                    |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Golang LLD: Design a Cache System | [Solution](https://github.com/the-arcade-01/golang-low-level-design/blob/main/cache-system/Readme.md) | [Blog](https://dev.to/the-arcade-01/golang-lld-design-a-cache-system-lru-lfu-fifo-2k9o) |
+| Problem                             | Solution                                                                                                | Blog                                                                                   |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Golang LLD: Design a Cache System   | [Solution](https://github.com/the-arcade-01/golang-low-level-design/blob/main/cache-system/Readme.md)   | [Blog](https://dev.to/arcadebuilds/golang-lld-design-a-cache-system-lru-lfu-fifo-2k9o) |
+| Golang LLD: Design a Task Scheduler | [Solution](https://github.com/the-arcade-01/golang-low-level-design/blob/main/task-scheduler/Readme.md) | [Blog](https://dev.to/arcadebuilds/golang-lld-design-a-task-scheduler-1c9k)            |
 
 **Note:**
 

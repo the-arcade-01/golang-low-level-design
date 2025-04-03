@@ -13,26 +13,26 @@ var (
 
 type WorkerPool struct {
 	workers     int
+	workerQueue chan models.Runnable
 	wg          sync.WaitGroup
-	workerQueue chan *models.Task
 }
 
 func NewWorkerPool(workers int) *WorkerPool {
 	once.Do(func() {
-		pool := &WorkerPool{
+		pool = &WorkerPool{
 			workers:     workers,
-			workerQueue: make(chan *models.Task),
+			workerQueue: make(chan models.Runnable),
 		}
 
-		for i := range workers {
+		for i := range pool.workers {
 			pool.wg.Add(1)
+			fmt.Printf("Worker routine initialized, ID: %v\n", i)
 
 			go func(i int) {
 				defer pool.wg.Done()
-				fmt.Printf("Worker pool %v initialized\n", i)
 
-				for task := range pool.workerQueue {
-					fmt.Printf("%v %v %v %v", task.ID, task.Name, task.Type, task.StartTime)
+				for run := range pool.workerQueue {
+					run.Run()
 				}
 			}(i)
 		}
@@ -40,8 +40,8 @@ func NewWorkerPool(workers int) *WorkerPool {
 	return pool
 }
 
-func (p *WorkerPool) AddJob(task *models.Task) {
-	p.workerQueue <- task
+func (p *WorkerPool) Add(run models.Runnable) {
+	p.workerQueue <- run
 }
 
 func (p *WorkerPool) Wait() {
