@@ -91,3 +91,7 @@ Design and implement a **Task Scheduler** that can manage and execute tasks effi
 - The task is removed from the scheduler and will not be executed.
 
 ---
+
+## Solution
+
+![Task Scheduler](./task-scheduler.png)

@@ -33,7 +33,7 @@ func NewTaskScheduler(pool *config.WorkerPool) *TaskScheduler {
 		}
 		taskScheduler.cond = sync.NewCond(taskScheduler.mtx)
 
-		go taskScheduler.Run()
+		go taskScheduler.Execute()
 	})
 	return taskScheduler
 }
@@ -60,7 +60,7 @@ func (t *TaskScheduler) Stop(task *Task) {
 	}
 }
 
-func (t *TaskScheduler) Run() {
+func (t *TaskScheduler) Execute() {
 	for {
 		t.mtx.Lock()
 		if t.taskQueue.Len() == 0 {
